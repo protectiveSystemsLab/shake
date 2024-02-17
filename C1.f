@@ -416,7 +416,7 @@ C
      1  5X,6HLAYER ,
      2 10X,5HDEPTH ,8X,9HMAX. ACC. 10X, 4HTIME ,6X, 12HMEAN SQ. FR. ,
      3  9X, 10HACC. RATIO , 6X, 14H TH SAVED		,
-     4/22X, 2HFT ,12X, 1HG ,16X, 4HSEC  ,9X, 5HC/SEC ,13X,10HQUIET ZONE 
+     4/22X, 2HM ,12X, 1HG ,16X, 4HSEC  ,9X, 5HC/SEC ,13X,10HQUIET ZONE 
      5  7X, 11HACC. RECORD   )
  6000 FORMAT(/37H  PRINT        ACCELERATION IN LAYER  ,I3)
  6001 FORMAT(/46H  PRINT AND PUNCH        ACCELERATION IN LAYER ,I3)
@@ -553,7 +553,7 @@ C     WRITE(6,2037) PRMUL
       EMAX(I) = EMAX(I)*100.
       IF (TP(I) .NE. 0)  GO TO 231
       STR(I) = EMAX(I)*GL(I)*10.
-      WRITE(6,2107) I, TP(I), DEPTH(I), EM , BL(I), GL(I)
+      WRITE(6,2107) I, TP(I), DEPTH(I)*0.3048, EM , BL(I), GL(I)
       GO TO 23
 C
 C   USE UNIFORM STRAIN AMPLITUDE (EM) TO GET NEW VALUES FOR DAMPING
@@ -585,8 +585,8 @@ C ----------------------------------------------------------------------
       B = B/100.
       DG = (GG - GL(I))*100./GG
       DB = ( B - BL(I))*100./B
-      WRITE(6,2007) I, TP(I), DEPTH(I), EM, B, BL(I), DB, GG, GL(I), DG,
-     + RATIO(I)
+      WRITE(6,2007) I, TP(I), DEPTH(I)*0.3048, EM, B, BL(I), DB, GG,
+     + GL(I), DG, RATIO(I)
       IF (ABS(DG) .GT. DGMAX)  DGMAX = ABS(DG)
       IF (ABS(DB) .GT. DGMAX)  DGMAX = ABS(DB)
       IF (JIS .EQ. 1) GO TO 23
@@ -595,8 +595,8 @@ C ----------------------------------------------------------------------
    23 CONTINUE
       IF (JIS .NE. 1) GO TO 53
       WRITE(6,2011)
-      WRITE(6,2001) (I,TP(I), H(I),DEPTH(I), EMAX(I), STR(I), TMAX(I),
-     1 I = 1,N1)
+      WRITE(6,2001) (I,TP(I), H(I),DEPTH(I)*0.3048, EMAX(I),
+     1 STR(I)*0.04788, TMAX(I), I = 1,N1)
    53 CALL CXSOIL(N1)
       DO 44 I = 1,MFOLD
    44 X(I) = CMPLX(AA(1,I),AA(2,I))
@@ -605,7 +605,7 @@ C
  2000 FORMAT(/23H  VALUES IN TIME DOMAIN //
      1,' NO TYPE DEPTH  UNIFRM. <---- DAMPING ---->   <---- SHEAR',
      2' MODULUS ----->    G/Go'/
-     3'         (FT)   STRAIN  NEW    USED   ERROR      NEW       USED',
+     3'         (m)    STRAIN  NEW    USED   ERROR      NEW       USED',
      4'    ERROR   RATIO'/
      5'--- ---- ----  ------- ----- ------  ------   -------   -------',
      6'   ------   -----')
@@ -613,7 +613,7 @@ C
  2011 FORMAT(/23H  VALUES IN TIME DOMAIN //
      1 2X, 5HLAYER ,2X,4HTYPE ,6X,9HTHICKNESS ,10X, 5HDEPTH ,5X, 
      2 10HMAX STRAIN ,5X, 10HMAX STRESS ,10X, 4HTIME /
-     3 23X, 2HFT 14X, 2HFT 9X, 5HPRCNT 12X, 3HPSF 13X, 3HSEC /)
+     3 23X, 2HM 14X, 2HM 9X, 5HPRCNT 12X, 3HkPa 13X, 3HSEC /)
  2001 FORMAT(2I6, 2F15.1, F15.5,2F15.2)
  2007 FORMAT(2I3, F7.1, F8.5, F6.3, 1X, F6.3 ,F9.1, 1X,
      1 F9.1,1X, F9.1, F9.1, F8.3)
@@ -738,12 +738,13 @@ c-----------------------------------------------------------------------
       FACT(I) = GL(I) * 1000. * FACT(I)
 c-----------------------------------------------------------------------
    16 CONTINUE
+      TD = TD * 0.3048
   131 WRITE(6,2021) ML,TD
       WRITE(6,2015)
       DO 17 I = 1,N1
-      VS = SQRT( GL(I)/R(I))
-      WRITE(6,2005) I, TP(I), H(I),DEPTH(I)
-     1,WEIGHT(I),GL(I),BL(I),WL(I),VS
+      VS = SQRT( GL(I)/R(I)) * 0.3048
+      WRITE(6,2005) I, TP(I), H(I)*0.3048,DEPTH(I)*.3048
+     1,WEIGHT(I)*47.88026,GL(I)*47.88026,BL(I),WL(I)*16.0185,VS
    17 CONTINUE
       I = N1 + 1
       VS = SQRT(GL(I)/R(I))
@@ -755,9 +756,12 @@ c-----------------------------------------------------------------------
  2020 FORMAT(22H NEW SOIL PROFILE NO. ,I3,5X,17H IDENTIFICATION   ,6A6)
  2021 FORMAT(17H NUMBER OF LAYERS ,I20,10X,16HDEPTH TO BEDROCK,F14.2/)
  2015 FORMAT(  '  NO. TYPE  THICKNESS   DEPTH  ',
-     1   'Tot. PRESS.  MODULUS  DAMPING   UNIT WT.  SHEAR VEL' /
-     3   '              (ft)      (ft)      (ksf)       (ksf)',
-     4    '             (kcf)    (fps)')
+c     1   'Tot. PRESS.  MODULUS  DAMPING   UNIT WT.  SHEAR VEL' /
+c     3   '              (ft)      (ft)      (ksf)       (ksf)',
+c     4    '             (kcf)    (fps)')
+     1   "Tot. PRESS.  MODULUS  DAMPING   UNIT WT.  SHEAR VEL" /
+     3   "              (m)       (m)       (kPa)       (kPa)",
+     4    "            (t/m^3)    (m/s)")
  2005 FORMAT(I4,I5,F10.2,F10.2,F10.2,F12.0,F8.3,F9.3,F10.1)
  2105 FORMAT(    I4, 3X, 4HBASE  25X, F15.0, F8.3, F9.3, F10.1)
       RETURN

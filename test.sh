@@ -11,7 +11,7 @@ mkdir -p output/test
 
 cd test-data
 
-SHAKE16 INP.DAT ../output/test/output1.txt ../output/test/output2.txt
+../SHAKE16 INP.DAT ../output/test/output1.txt ../output/test/output2.txt
 
 cd ..
 

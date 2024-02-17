@@ -171,8 +171,10 @@ C     if (KK.EQ.5) go to 252
       if (LT.EQ.1)  write(6,2002) LH, (IDNT(I),I=1,6)
       write(6, 2005) SFX
       write(6,2003) XMAX, TMAX
-  252 if (KK.EQ.6.AND.LT.EQ.0)  write(6,2001) DPTH,XMAX,TMAX,SFX,XEND,NC
-      if (KK.EQ.6.AND.LT.EQ.1) write(6,2010) DPTH,XMAX,TMAX,SFX, XEND,NC
+  252 if (KK.EQ.6.AND.LT.EQ.0)  write(6,2001) DPTH*0.3048,XMAX,
+     . TMAX, SFX,XEND,NC
+      if (KK.EQ.6.AND.LT.EQ.1) write(6,2010) DPTH*0.3048,XMAX,
+     . TMAX,SFX, XEND,NC 
       if (K2.EQ.0) go to 262
       write(7,2006) XMAX, (TITLE(I),I=1,5)
       if (LT.EQ.1)  write(7,2002) LH, (IDNT(I),I=1,6)
